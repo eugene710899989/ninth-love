@@ -9,7 +9,11 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Tags;
+
 class TagController
 {
-
+    function list(){
+        return dataResp(Tags::ofDisplay()->get());
+    }
 }

@@ -11,14 +11,10 @@ namespace App\Models;
 /**
  * @property mixed agree
  */
-class Tags extends BaseModel
+class UserTags extends BaseModel
 {
-    protected $table = 'tags';
+    protected $table = 'user_tags';
 
     protected $guarded = ["id"];
 
-    public function scopeOfDisplay($query)
-    {
-        return $query->where('display', 1);
-    }
 }

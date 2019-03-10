@@ -11,21 +11,14 @@ namespace App\Models;
 /**
  * @property mixed agree
  */
-class Users extends BaseModel
+class Tags extends BaseModel
 {
-    protected $table = 'users';
+    protected $table = 'tags';
 
     protected $guarded = ["id"];
-//
-//    // ========== 作用域 ==========
-//
-//    public function scopeOfOperator($query, int $operatorId)
-//    {
-//        return $query->where('operator_id', $operatorId);
-//    }
-//
-//    public function scopeOfTerm($query, int $termId)
-//    {
-//        return $query->where('term_id', $termId);
-//    }
+
+    public function scopeOfDisplay($query)
+    {
+        return $query->where('display', 1);
+    }
 }

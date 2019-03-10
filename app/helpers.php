@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\CommonConfig;
-use Firebase\JWT\JWT;
+use App\Http\Middleware\UserHelper;
 use GuzzleHttp\Client;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -89,78 +88,6 @@ function getChineseDate(string $date): string
     return date('Y年n月j日', strtotime($date));
 }
 
-function getCommonConfig(string $key, $default = null)
-{
-    $ret = CommonConfig::findByKey($key);
-
-    if ($ret && $ret->value) {
-        return $ret->value;
-    }
-
-    Log::warning('出现数据库未有的配置项 # ' . $key);
-
-    return $default;
-}
-
-function shortenURL(string $rawURL): string
-{
-    $params = [
-        'source'   => '31641035',
-        'url_long' => $rawURL,
-    ];
-
-    $url = 'https://api.t.sina.com.cn/short_url/shorten.json?' . http_build_query($params);
-
-    try {
-        $resp = (new Client())->get($url)->getBody()->getContents();
-        $ret = json_decode($resp)[0];
-        return $ret->url_short ?? $rawURL;
-    } catch (Exception $e) {
-        return $rawURL;
-    }
-}
-
-/**
- * 风变短链接转换服务
- *
- * @param string $long_url
- * @param int $domain_id
- *
- * @return string
- */
-function fcShortenUrl(string $long_url, int $domain_id = 0): string
-{
-    if (env('APP_ENV') !== 'production') {
-        return $long_url;
-    }
-
-    try {
-        $resp = (new Client(['timeout' => 3]))->post(config('forchange.shorten_url_domain') . '/e/', [
-            'json' => [
-                'domain_id' => $domain_id,
-                'path'      => $long_url,
-            ],
-        ])->getBody()->getContents();
-        return json_decode($resp)->data->url ?? $long_url;
-    } catch (Exception $e) {
-        Log::error('短链接转换失败 # ' . $e->getMessage(), [$long_url]);
-        return $long_url;
-    }
-}
-
-function getQiniuURL(string $content): string
-{
-    try {
-        $content = json_decode($content, true);
-        $resp = (new Client())->post(config('forchange.image2qn'), ['json' => $content])->getBody()->getContents();
-        $key = json_decode($resp)->key;
-        return config('forchange.static_domain') . '/' . $key;
-    } catch (Exception $e) {
-        Log::error('图片生成失败 # ' . $e->getMessage(), $e->getTrace());
-        throw new BadRequestHttpException('图片生成失败');
-    }
-}
-
 function parsePagination(LengthAwarePaginator $data, Closure $closure, array $attachData = [], string $listKey = 'list')
 {
     $list = [];
@@ -176,32 +103,6 @@ function parsePagination(LengthAwarePaginator $data, Closure $closure, array $at
     ]);
 }
 
-function createToken(array $payload): string
-{
-    try {
-        return JWT::encode($payload, config('jwt.secret'), config('jwt.algorithm'));
-    } catch (Exception $e) {
-        throw new ServiceUnavailableHttpException(null, '生成 Token 失败');
-    }
-}
-
-function decodeToken(string $token)
-{
-    try {
-        return JWT::decode($token, config('jwt.secret'), [config('jwt.algorithm')]);
-    } catch (Exception $e) {
-        throw new UnauthorizedHttpException('', 'Token 无效');
-    }
-}
-
-function getProjectUrl(): string
-{
-    if ($domain = config('forchange.ci_domain')) {
-        return $domain . config('forchange.ci_path');
-    }
-
-    return url();
-}
 
 function convert($size)
 {
@@ -241,60 +142,41 @@ function object_diff(array $arr1, array $arr2, array $keys): array
     return $arr1;
 }
 
-/**
- * 数据库事务
- *
- * @param Closure $callback
- *
- * @return mixed
- * @throws Exception
- */
-function fcTransaction(Closure $callback)
-{
-    DB::beginTransaction();
-    DB::connection('python')->beginTransaction();
-    DB::connection('for_os')->beginTransaction();
-
-    try {
-        return tap($callback(), function () {
-            DB::commit();
-            DB::connection('python')->commit();
-            DB::connection('for_os')->commit();
-        });
-    } catch (Exception $e) {
-        DB::rollBack();
-        DB::connection('python')->rollBack();
-        DB::connection('for_os')->rollBack();
-        throw $e;
-    }
+function file_path($key){
+    $user = UserHelper::$user;
+    $md5 = md5("{$user->openid}-{$key}");
+    return "/{$user->user_id}/{$md5}";
 }
 
-/**
- * 替换内网链接
- *
- * @param string $originalUrl
- *
- * @return mixed
- */
-function replaceInternalUrl(string $originalUrl)
-{
-    return preg_replace('/http\:\/\/api-ai-boss.*ninth-studio\.svc\:8080/', getProjectUrl(), $originalUrl);
+function file_ext($flie_path){
+    $arr = pathinfo($flie_path);
+    return $arr['extension'];
 }
-
-function http2https(?string $originalUrl)
-{
-    return is_null($originalUrl) ? null : str_replace('http://', 'https://', $originalUrl);
-}
-
-if (!function_exists('db_esc')) {
-    /**
-     * 数据库escape字符串
-     * @param string $str
-     * @return string
-     */
-    function db_esc(string $str): string
-    {
-        $ret = str_replace(['\\','%', '_', '@', '""', "'",';'], ['\\\\','\%', '\_', '\@', '\"', "\'",'\;'], $str);
-        return $ret;
-    }
-}
+//
+///**
+// * 数据库事务
+// *
+// * @param Closure $callback
+// *
+// * @return mixed
+// * @throws Exception
+// */
+//function fcTransaction(Closure $callback)
+//{
+//    DB::beginTransaction();
+//    DB::connection('python')->beginTransaction();
+//    DB::connection('for_os')->beginTransaction();
+//
+//    try {
+//        return tap($callback(), function () {
+//            DB::commit();
+//            DB::connection('python')->commit();
+//            DB::connection('for_os')->commit();
+//        });
+//    } catch (Exception $e) {
+//        DB::rollBack();
+//        DB::connection('python')->rollBack();
+//        DB::connection('for_os')->rollBack();
+//        throw $e;
+//    }
+//}

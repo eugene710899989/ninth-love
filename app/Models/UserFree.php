@@ -11,9 +11,9 @@ namespace App\Models;
 /**
  * @property mixed agree
  */
-class UserTags extends BaseModel
+class UserFree extends BaseModel
 {
-    protected $table = 'user_tags';
+    protected $table = 'user_free';
 
     protected $guarded = ["id"];
 

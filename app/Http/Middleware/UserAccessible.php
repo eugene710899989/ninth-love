@@ -6,9 +6,9 @@
  * Time: 上午11:40
  */
 
-namespace App\Helpers;
+namespace App\Http\Middleware;
 
-use App\Exceptions\Jwt\NoTokenException;
+use EasyWeChat\Kernel\Exceptions\BadRequestException;
 use Firebase\JWT\JWT;
 
 trait UserAccessible
@@ -29,7 +29,7 @@ trait UserAccessible
             $array = explode(" ", $token);
             $len = count($array);
             if ($len < 1) {
-                throw new NoTokenException("Missing Token", 401);
+                throw new BadRequestException("Missing Token", 401);
             }
             $t_token = $array[$len - 1];
         } else if (isset($cookie['token'])) {

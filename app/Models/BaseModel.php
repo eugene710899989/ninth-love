@@ -55,6 +55,7 @@ class BaseModel extends Model
         return join('.', [$instance->getConnection()->getDatabaseName(), $instance->getTable()]);
     }
 
+
     public static function cacheFind($id, int $minutes = null, bool $refresh = false, bool $throw = true)
     {
         $cacheKey = self::getTableName() . '_' . $id;
