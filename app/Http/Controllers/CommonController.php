@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class CommonController
+class CommonController  extends Controller
 {
     function upload(Request $request)
     {

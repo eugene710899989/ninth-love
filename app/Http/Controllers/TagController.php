@@ -11,7 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tags;
 
-class TagController
+class TagController extends Controller
 {
     function list(){
         return dataResp(Tags::ofDisplay()->get());

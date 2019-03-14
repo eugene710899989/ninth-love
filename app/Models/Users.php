@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * @property mixed agree
  * @property mixed username
+ * @property mixed id
+ * @property mixed gender
  */
 class Users extends BaseModel
 {
@@ -92,6 +94,14 @@ class Users extends BaseModel
     public function freeTimes()
     {
         return $this->hasMany(UserFree::class, 'user_id');
+    }
+
+    public function invites(){
+        return $this->hasMany(UserInvites::class, 'invitee_id');
+    }
+
+    public function inviteByOther(){
+        return $this->hasMany(UserInvites::class, 'user_id');
     }
 //
 //    // ========== 作用域 ==========

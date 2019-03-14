@@ -28,8 +28,9 @@ class WeChatController extends Controller
         $code = $request->input("code");
         $re = $app->auth->session( $code);
         if(!empty($re["errcode"])){
-            abort(401,"错误的数据:{$re["errmsg"]}");
+//            abort(401,"错误的数据:{$re["errmsg"]}");
         }
+//        $re = ["openid"=>"oKJrM4o7gzv8l0pe5MD2UfJOOlNM"];
         //"session_key" => "v0Rm7ALadiP/EaAGGKgzdg=="
         //  "openid" => "oKJrM4o7gzv8l0pe5MD2UfJOOlNM"
         $user =  Users::cacheFirstWhere(["openid"=>$re["openid"]],100,false,false);

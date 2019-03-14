@@ -14,19 +14,20 @@ class UserHelper
      * @var UserHelper
      */
     public static $user;
-    
+    public static $instance;
+
     public $openid;
     public $user_id;
     public $payload = [];
 
     const IOS = 'ios';
     const ANDROID = 'android';
-    
+
     protected $attr = [
-        "oid"       => "openid",
-        "uid"       => "user_id",
+        "oid" => "openid",
+        "uid" => "user_id",
     ];
-    
+
     private function __construct($payload = [])
     {
         try {
@@ -36,13 +37,13 @@ class UserHelper
                     $this->$value = $payload[$key];
                 }
             }
-            static::$user= Users::find($this->user_id);
+            static::$user = Users::find($this->user_id);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 401);
         }
-        
+
     }
-    
+
     /**
      * 单例
      *
@@ -61,7 +62,7 @@ class UserHelper
         }
         return self::$user;
     }
-    
+
     /**
      * @return mixed
      */
@@ -69,15 +70,15 @@ class UserHelper
     {
         return $this->openid;
     }
-    
+
     /**
      * @return mixed
      */
     public function getId()
     {
-        return $this->id;
+        return $this->user_id;
     }
-    
+
     public function toArray()
     {
         $array = [];

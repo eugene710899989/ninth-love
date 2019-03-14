@@ -17,10 +17,26 @@ Route::any('/wechat', 'WeChatController@serve');
 
 
 Route::middleware(['api.user_jwt'])->group(function () {
-    Route::post("user/{user}/info", "UserController@init");
-    Route::post("user/{user}/update", "UserController@update");
-    Route::get("info/{user}", "UserController@info");
-    Route::get("agree/{user}", "UserController@agree");
+    //用户信息
+    Route::get("user/info", "UserController@info");
+    //初始化用户信息
+    Route::post("user/info", "UserController@init");
+    //更新用户信息
+    Route::post("user/update", "UserController@update");
+    //标签列表
     Route::get("tag/list", "TagController@list");
+    //用户约会信息
+    Route::get("user/date_list", "UserController@dateList");
+    //邀请用户
+    Route::post("user/{user}/invite", "UserController@invite");
+    //邀请列表
+    Route::get("user/{user}/invites", "UserController@invites");
+    //约会列表
+    Route::get("user/{user}/invites", "UserController@invites");
+    //同意邀请
+    Route::get("agree/{user}", "UserController@agree");
+    //文件上传
     Route::post("upload", "CommonController@upload");
+    //推荐用户列表
+    Route::get("recommend/list", "RecommendController@list");
 });
