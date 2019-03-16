@@ -39,4 +39,8 @@ Route::middleware(['api.user_jwt'])->group(function () {
     Route::post("upload", "CommonController@upload");
     //推荐用户列表
     Route::get("recommend/list", "RecommendController@list");
+
+    Route::get("schools/list", "CommonController@schools");
+    //专业列表
+    Route::get("majors/list", "CommonController@majors");
 });

@@ -8,6 +8,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,12 +17,15 @@ use Illuminate\Support\Facades\DB;
  * @property mixed username
  * @property mixed id
  * @property mixed gender
+ * @property mixed birthday
  */
 class Users extends BaseModel
 {
     protected $table = 'users';
 
     protected $guarded = ["id"];
+
+    protected $appends = ['age'];
 
     function insertInfo(Request $request)
     {
@@ -102,6 +106,10 @@ class Users extends BaseModel
 
     public function inviteByOther(){
         return $this->hasMany(UserInvites::class, 'user_id');
+    }
+
+    public function getAgeAttribute(){
+        return Carbon::parse($this->birthday)->diffInYears();
     }
 //
 //    // ========== 作用域 ==========

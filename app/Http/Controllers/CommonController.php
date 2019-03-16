@@ -9,7 +9,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Middleware\UserHelper;
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -27,5 +27,25 @@ class CommonController  extends Controller
             return errorResp("upload fail");
         }
         return dataResp(["src" => Storage::url($path)]);
+    }
+
+    function schools(Request $request){
+        $school_search_name = $request->input("name");
+        if($school_search_name){
+            $school_names= Users::where("school","like","%{$school_search_name}%")->pluck("school")->unique();
+        }else{
+            $school_names = Users::all()->pluck("school")->unique();
+        }
+        return dataResp($school_names);
+    }
+
+    function majors(Request $request){
+        $school_search_name = $request->input("name");
+        if($school_search_name){
+            $school_names= Users::where("major","like","%{$school_search_name}%")->pluck("major")->unique();
+        }else{
+            $school_names = Users::all()->pluck("major")->unique();
+        }
+        return dataResp($school_names);
     }
 }

@@ -12,7 +12,6 @@ namespace App\Http\Controllers;
 use App\Http\Middleware\UserHelper;
 use App\Models\UserInvites;
 use App\Models\Users;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,7 +34,9 @@ class UserController extends Controller
     {
         $user = UserHelper::$user;
         unset($user->payload);
-        return dataResp($user);
+        $userModel = Users::with("tags")->find($user->user_id);
+
+        return dataResp($userModel);
     }
 
     //用户信息注册接口
@@ -54,6 +55,7 @@ class UserController extends Controller
             'school'       => 'required|string',
             'major'        => 'required|string',
             'gender'       => 'required|in:0,1,2',
+            'city'         => 'required|string',
             'tags'         => 'array',
             'time_areas'   => 'array',
         ]);
@@ -75,7 +77,7 @@ class UserController extends Controller
         $request->validate([
             'nickname'   => 'string',
             'tags'       => 'array',
-            'avatar'       => 'required|url',
+            'avatar'     => 'required|url',
             'time_areas' => 'array',
         ]);
         $user->updatbeInfo($request);
