@@ -26,4 +26,8 @@ class SellerController extends Controller
         $pageData = new LengthAwarePaginator(array_slice($shops->toArray(), $offset, $perPage), count($shops), $perPage);
         return dataResp(["list" => $pageData->items(), 'total' => count($shops), 'total_page' => $pageData->lastPage(), 'current_page' => $pageData->currentPage()]);
     }
+
+    function productions(Sellers $seller){
+
+    }
 }
