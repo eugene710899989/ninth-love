@@ -32,7 +32,7 @@ class UserController extends Controller
     //用户信息获取接口
     function info()
     {
-        $user = UserHelper::$user;
+        $user = UserHelper::$instance;
         unset($user->payload);
         $userModel = Users::with("tags")->find($user->user_id);
 
@@ -42,7 +42,7 @@ class UserController extends Controller
     //用户信息注册接口
     function init(Request $request)
     {
-        $user = Users::findOrFail(UserHelper::$user->user_id);
+        $user = Users::findOrFail(UserHelper::$instance->user_id);
         if ($user->agree != 1) {
             return errorResp("未同意隐私协议", 403);
         }
@@ -70,7 +70,7 @@ class UserController extends Controller
     //用户信息更新接口
     function update(Request $request)
     {
-        $user = Users::findOrFail(UserHelper::$user->user_id);
+        $user = Users::findOrFail(UserHelper::$instance->user_id);
         if ($user->agree != 1) {
             return errorResp("未同意隐私协议", 403);
         }
@@ -92,7 +92,7 @@ class UserController extends Controller
             $invited = Users::find($invite->user_id);
             $re[] = ["created" => $invite->created_at, "invite" => $invited->nickname];
         }
-        $user = Users::find(UserHelper::$user->getId());
+        $user = Users::find(UserHelper::$instance->getId());
         return dataResp(["list" => $re, "user" => $user]);
     }
 
@@ -111,14 +111,14 @@ class UserController extends Controller
 
     function dateList()
     {
-        $user = Users::findOrFail(UserHelper::$user->user_id);
+        $user = Users::findOrFail(UserHelper::$instance->user_id);
         $invites = $user->inviteByOther()->limit(100)->orderBy("id", "desc")->get();
         $re = [];
         foreach ($invites as $invite) {
             $invited = Users::find($invite->user_id);
             $re[] = ["created" => $invite->created_at, "invite" => $invited->nickname];
         }
-        $user = Users::find(UserHelper::$user->getId());
+        $user = Users::find(UserHelper::$instance->getId());
         return dataResp(["list" => $re, "user" => $user]);
     }
 

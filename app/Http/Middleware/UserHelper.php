@@ -13,8 +13,8 @@ class UserHelper
     /**
      * @var UserHelper
      */
-    public static $user;
     public static $instance;
+    public static $user;
 
     public $openid;
     public $user_id;
@@ -54,13 +54,13 @@ class UserHelper
      */
     public static function instance($payload = [])
     {
-        if (is_null(self::$user)) {
+        if (is_null(self::$instance)) {
             if (count($payload) == 0) {
                 throw new NoTokenException("no authorization", 401);
             }
-            self::$user = new self($payload);
+            self::$instance = new self($payload);
         }
-        return self::$user;
+        return self::$instance;
     }
 
     /**

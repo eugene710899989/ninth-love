@@ -43,4 +43,24 @@ Route::middleware(['api.user_jwt'])->group(function () {
     Route::get("schools/list", "CommonController@schools");
     //专业列表
     Route::get("majors/list", "CommonController@majors");
+
+    //商家列表
+    Route::get("seller/list", "SellerController@list");
+    Route::get("seller/{seller}/productions", "SellerController@productions");
+
+    //订单列表
+    Route::get("order/list", "OrderController@list");
+    Route::post("order/{seller}/create", "OrderController@create");
+    Route::post("order/callback", "OrderController@callback");
+
+    //恋爱吧
+    Route::get("post/list", "PostController@list");
+    Route::get("post/{post}", "PostController@detail");
+    Route::post("post/{post}/comment", "PostController@comment");
+    Route::post("post/create", "PostController@create");
+    Route::post("post/{post}/delete", "PostController@delete");
+    Route::post("post/{post}/zan", "PostController@like");
+    Route::post("post/{post}/dislike", "PostController@dislike");
+
+
 });

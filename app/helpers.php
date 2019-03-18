@@ -24,6 +24,8 @@ function dataResp($data, string $message = null): array
     if ($message) {
         $ret['message'] = $message;
     }
+    $ret['errno'] = 0;
+    $ret['errmsg'] = 0;
     $ret['use_memory_usage'] = convert(memory_get_peak_usage());
     $ret['assign_memory_usage'] = convert(memory_get_usage());
     $ret['real_memory_usage'] = convert(memory_get_usage(true));
@@ -42,12 +44,13 @@ function dataResp($data, string $message = null): array
  */
 function errorResp(string $message, $code = null, ?int $statusCode = 400)
 {
-    $ret = ['message' => $message];
+    $ret = ['errmsg' => $message];
 
     if ($code) {
         $ret['code'] = $code;
+    } else {
+        $ret['errno'] = -1;
     }
-
     return response($ret, $statusCode ?? 400);
 }
 
@@ -60,7 +63,7 @@ function errorResp(string $message, $code = null, ?int $statusCode = 400)
  */
 function createdResp($data)
 {
-    return response(['data' => $data], 201);
+    return response(['data' => $data, "errno" => 0, "errmsg" => "ok"], 200);
 }
 
 /**
@@ -70,7 +73,7 @@ function createdResp($data)
  */
 function noContentResp()
 {
-    return response('', 204);
+    return response(["errno" => 0, "errmsg" => "ok"], 200);
 }
 
 function isProdEnv()
@@ -142,16 +145,19 @@ function object_diff(array $arr1, array $arr2, array $keys): array
     return $arr1;
 }
 
-function file_path($key){
-    $user = UserHelper::$user;
+function file_path($key)
+{
+    $user = UserHelper::$instance;
     $md5 = md5("{$user->openid}-{$key}");
     return "/{$user->user_id}/{$md5}";
 }
 
-function file_ext($flie_path){
+function file_ext($flie_path)
+{
     $arr = pathinfo($flie_path);
     return $arr['extension'];
 }
+
 //
 ///**
 // * 数据库事务
@@ -180,3 +186,23 @@ function file_ext($flie_path){
 //        throw $e;
 //    }
 //}
+
+function getDistance($lat1, $lng1, $lat2, $lng2)
+{
+    $earthRadius = 6367000; //approximate radius of earth in meters
+    $lat1 = ($lat1 * pi()) / 180;
+    $lng1 = ($lng1 * pi()) / 180;
+    $lat2 = ($lat2 * pi()) / 180;
+    $lng2 = ($lng2 * pi()) / 180;
+    $calcLongitude = $lng2 - $lng1;
+    $calcLatitude = $lat2 - $lat1;
+    $stepOne = pow(sin($calcLatitude / 2), 2) + cos($lat1) * cos($lat2) * pow(sin($calcLongitude / 2), 2);
+    $stepTwo = 2 * asin(min(1, sqrt($stepOne)));
+    $calculatedDistance = $earthRadius * $stepTwo;
+    return round($calculatedDistance);
+}
+
+function humanizeDistance($m)
+{
+    return $m > 1000 ? ($m / 1000) . "千米" : ($m . "米");
+}

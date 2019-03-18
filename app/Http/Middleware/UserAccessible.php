@@ -15,8 +15,8 @@ trait UserAccessible
 {
     public function user()
     {
-        if (UserHelper::$user) {
-            return UserHelper::$user;
+        if (UserHelper::$instance) {
+            return UserHelper::$instance;
         }
         /** @var \Illuminate\Http\Request $request */
         $request = app('request');
