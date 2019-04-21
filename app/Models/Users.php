@@ -100,15 +100,23 @@ class Users extends BaseModel
         return $this->hasMany(UserFree::class, 'user_id');
     }
 
-    public function invites(){
+    public function invites()
+    {
         return $this->hasMany(UserInvites::class, 'invitee_id');
     }
 
-    public function inviteByOther(){
+    public function posts()
+    {
+        return $this->hasMany(UserPosts::class, 'user_id');
+    }
+
+    public function inviteByOther()
+    {
         return $this->hasMany(UserInvites::class, 'user_id');
     }
 
-    public function getAgeAttribute(){
+    public function getAgeAttribute()
+    {
         return Carbon::parse($this->birthday)->diffInYears();
     }
 //
