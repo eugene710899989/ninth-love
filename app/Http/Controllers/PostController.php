@@ -26,12 +26,13 @@ class PostController
     function create(Request $request)
     {
         $content = $request->input('content');
+        $images = $request->input('images');
         $longitude = $request->input('longitude');
         $latitude = $request->input('latitude');
         $user = UserHelper::$user;
         $cacheKey = "post_list_user_" . UserHelper::$user->id;
-        Cache::forever($cacheKey);
-        UserPosts::create(['user_id' => $user->id, 'content' => $content, 'longitude' => $longitude, 'latitude' => $latitude]);
+        Cache::forget($cacheKey);
+        UserPosts::create(['user_id' => $user->id, 'content' => $content, 'longitude' => $longitude, 'latitude' => $latitude,"images"=>$images]);
         return noContentResp();
     }
 
@@ -57,7 +58,7 @@ class PostController
 
     function list()
     {
-        $posts = UserPosts::orderBy('id', 'desc')->get(['id', 'content', 'user_id']);
+        $posts = UserPosts::orderBy('id', 'desc')->get(['id', 'content', 'user_id',"images"]);
         $perPage = 10;
         $offset = (Paginator::resolveCurrentPage() * $perPage) - $perPage;
         if (count($posts) > 0) {

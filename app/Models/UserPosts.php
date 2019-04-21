@@ -17,6 +17,8 @@ class UserPosts extends BaseModel
 
     protected $guarded = ["id"];
 
+    protected $casts=["images"=>"json"];
+
     function comments()
     {
         return $this->hasMany(UserComments::class, 'post_id');
