@@ -53,6 +53,11 @@ class PostController
                 $comment->user = Users::find($comment->user_id)->get(['id', 'nickname', 'avatar', 'desc']);
             }
         }
+        $user = Users::find($post->user_id)->get(['nickname', 'avatar', 'username', 'desc', 'school'])->first();
+        $post->user = $user;
+        $post->like_count = $post->userLike()->count();
+        $post->dislike_count = $post->userDislike()->count();
+        $post->comment_count = $post->comments()->count();
         return dataResp(['post' => $post, 'comments' => $comments]);
     }
 
