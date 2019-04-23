@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Middleware\UserHelper;
+use App\Models\CommentReplys;
 use App\Models\UserComments;
 use App\Models\UserPosts;
 use App\Models\Users;
@@ -130,6 +131,22 @@ class PostController
         }
 
         UserComments::create(['user_id' => UserHelper::$user->id, 'post_id' => $post->id, 'content' => $content]);
+        return noContentResp();
+    }
+
+    function reply(Request $request, UserComments $comments)
+    {
+        $content = $request->input('content');
+
+        if (empty($content)) {
+            abort(400, 'empty content');
+        }
+        $comment = CommentReplys::where(['user_id' => UserHelper::$user->id, 'comment_id' => $comments->id, 'content' => $content])->orderByDesc('id')->first();
+        if ($comment && Carbon::now()->diffInSeconds(Carbon::parse($comment->created_at)) <= 2) {
+            return errorResp("请求过于频繁", 400);
+        }
+
+        CommentReplys::create(['user_id' => UserHelper::$user->id, 'comment_id' => $comments->id, 'content' => $content]);
         return noContentResp();
     }
 

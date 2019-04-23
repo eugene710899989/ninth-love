@@ -21,7 +21,7 @@ class UserPosts extends BaseModel
 
     function comments()
     {
-        return $this->hasMany(UserComments::class, 'post_id');
+        return $this->hasMany(UserComments::class, 'post_id')->with("replys");
     }
 
     function userLike()

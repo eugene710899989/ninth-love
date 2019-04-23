@@ -57,6 +57,7 @@ Route::middleware(['api.user_jwt'])->group(function () {
     Route::get("post/list", "PostController@list");
     Route::get("post/{post}", "PostController@detail");
     Route::post("post/{post}/comment", "PostController@comment");
+    Route::post("post/{comments}/reply", "PostController@reply");
     Route::post("post/create", "PostController@create");
     Route::post("post/{post}/delete", "PostController@delete");
     Route::post("post/{post}/zan", "PostController@like");

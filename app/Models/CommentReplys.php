@@ -11,9 +11,9 @@ namespace App\Models;
 /**
  * @property mixed agree
  */
-class UserComments extends BaseModel
+class CommentReplys extends BaseModel
 {
-    protected $table = 'user_comments';
+    protected $table = 'comment_replys';
 
     protected $guarded = ["id"];
 
@@ -22,8 +22,8 @@ class UserComments extends BaseModel
         return $this->belongsTo(Users::class, 'id', 'user_id');
     }
 
-    public function replys()
+    public function comment()
     {
-        return $this->hasMany(CommentReplys::class, 'comment_id', 'id')->orderBy("id","desc");
+        return $this->belongsTo(UserComments::class, 'id', 'comment_id');
     }
 }
