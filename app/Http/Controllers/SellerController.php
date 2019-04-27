@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Middleware\UserHelper;
+use App\Models\ProductionCates;
 use App\Models\Sellers;
 use App\Models\Users;
 use Illuminate\Http\Request;
@@ -35,8 +36,20 @@ class SellerController extends Controller
         return dataResp(["list" => $pageData->items(), 'total' => count($shops), 'total_page' => $pageData->lastPage(), 'current_page' => $pageData->currentPage()]);
     }
 
-    function productions(Sellers $seller)
+    function productions(Sellers $seller, Request $request)
     {
-        return dataResp(["seller" => $seller, "productions" => $seller->productions()->get()]);
+        $cate_id = $request->input("cate_id");
+        $cates = $seller->cates()->get();
+        if (!$cate_id) {
+            $cate = $cates->first();
+        } else {
+            $cate = ProductionCates::findOrFail($cate_id);
+        }
+        if ($cate) {
+            $productions = $cate->productions()->get();
+        } else {
+            $productions = [];
+        }
+        return dataResp(["seller" => $seller, "productions" => $productions, "cates" => $cates]);
     }
 }

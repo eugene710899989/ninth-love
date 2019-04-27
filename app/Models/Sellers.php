@@ -39,4 +39,9 @@ class Sellers extends BaseModel
 //       return  DB::table('sellers')->raw(DB::raw($sql));
     }
 
+    function cates()
+    {
+        return $this->hasMany(ProductionCates::class, "seller_id", "id")->orderBY("pos","asc");
+    }
+
 }

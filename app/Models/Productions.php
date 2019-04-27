@@ -18,4 +18,9 @@ class Productions extends BaseModel
 
     protected $guarded = ["id"];
 
+    function cate()
+    {
+        return $this->hasOne(ProductionCates::class, "id", "cate_id");
+    }
+
 }
