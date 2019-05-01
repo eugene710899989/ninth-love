@@ -19,8 +19,9 @@ class UserController extends Controller
 {
 
     //用户同意协议接口
-    function agree(Users $user)
+    function agree()
     {
+        $user = Users::findOrFail(UserHelper::$instance->user_id);
         if ($user->agree != 0) {
             return errorResp("你已同意协议");
         }
@@ -84,13 +85,14 @@ class UserController extends Controller
         return noContentResp();
     }
 
-    function invites(Users $user)
+    function invites()
     {
+        $user = Users::findOrFail(UserHelper::$instance->user_id);
         $invites = $user->invites()->limit(100)->orderBy("id", "desc")->get();
         $re = [];
         foreach ($invites as $invite) {
             $invited = Users::find($invite->user_id);
-            $re[] = ["created" => $invite->created_at, "invite" => $invited->nickname];
+            $re[] = ["created" => $invite->created_at, "invite" => $invited->nickname, 'id' => $invite->id];
         }
         $user = Users::find(UserHelper::$instance->getId());
         return dataResp(["list" => $re, "user" => $user]);
@@ -101,13 +103,40 @@ class UserController extends Controller
 
     }
 
-    function invite(Request $request, Users $user)
+    function invite(Users $invited_user)
     {
-        $invited_user = Users::findOrFail($request->input('user_id'));
-        UserInvites::firstOrCreate(['user_id' => $user->id, 'invitee_id' => $invited_user->id, 'result' => UserInvites::INVITING]);
+        UserInvites::firstOrCreate(['user_id' => UserHelper::$instance->getId(), 'invitee_id' => $invited_user->id, 'result' => UserInvites::INVITING]);
         return noContentResp();
     }
 
+    function agree_invite(UserInvites $invitee)
+    {
+        $user_id = UserHelper::$instance->getId();
+
+        if ($invitee->invitee_id != $user_id) {
+            return errorResp("不属于该用户", 403);
+        }
+        if ($invitee->result != 0) {
+            return errorResp("邀请已经同意或拒绝", 403);
+        }
+        $invitee->result = 1;
+        $invitee->save();
+        return noContentResp();
+    }
+
+    function refuse_invite(UserInvites $invitee)
+    {
+        $user_id = UserHelper::$instance->getId();
+        if ($invitee->invitee_id != $user_id) {
+            return errorResp("不属于该用户", 403);
+        }
+        if ($invitee->result != 0) {
+            return errorResp("邀请已经同意或拒绝", 403);
+        }
+        $invitee->result = -1;
+        $invitee->save();
+        return noContentResp();
+    }
 
     function dateList()
     {
@@ -116,9 +145,8 @@ class UserController extends Controller
         $re = [];
         foreach ($invites as $invite) {
             $invited = Users::find($invite->user_id);
-            $re[] = ["created" => $invite->created_at, "invite" => $invited->nickname];
+            $re[] = ["created" => $invite->created_at, "invite" => $invited->nickname, 'id' => $invite->id];
         }
-        $user = Users::find(UserHelper::$instance->getId());
         return dataResp(["list" => $re, "user" => $user]);
     }
 

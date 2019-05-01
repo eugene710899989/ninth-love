@@ -21,20 +21,24 @@ Route::middleware(['api.user_jwt'])->group(function () {
     Route::get("user/info", "UserController@info");
     //初始化用户信息
     Route::post("user/info", "UserController@init");
+
+    //同意协议
+    Route::get("agree", "UserController@agree");
+
     //更新用户信息
     Route::post("user/update", "UserController@update");
     //标签列表
     Route::get("tag/list", "TagController@list");
     //用户约会信息
     Route::get("user/date_list", "UserController@dateList");
+
     //邀请用户
     Route::post("user/{user}/invite", "UserController@invite");
     //邀请列表
-    Route::get("user/{user}/invites", "UserController@invites");
-    //约会列表
-    Route::get("user/{user}/invites", "UserController@invites");
+    Route::get("user/invites", "UserController@invites");
     //同意邀请
-    Route::get("agree/{user}", "UserController@agree");
+    Route::put("invite/{invitee}/agree", "UserController@agree_invite");
+    Route::put("invite/{invitee}/refuse", "UserController@refuse_invite");
     //文件上传
     Route::post("upload", "CommonController@upload");
     //推荐用户列表
