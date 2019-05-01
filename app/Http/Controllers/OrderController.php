@@ -34,9 +34,15 @@ class OrderController extends Controller
         if (empty($productions)) {
             abort(400, "产品数据未空");
         }
-        $invite_user = Users::findOrFail($request->input('invited_user_id'));
+        $invite_user = Users::find($request->input('invited_user_id'));
+        if(!$invite_user){
+            abort(404, "未找到邀请用户");
+        }
         $user = UserHelper::$user;
-        $invite = UserInvites::where(['user_id' => $user->id, 'invitee_id' => $invite_user->id, 'result' => 1])->firstOrFail();
+        $invite = UserInvites::where(['user_id' => $user->id, 'invitee_id' => $invite_user->id, 'result' => 1])->first();
+        if(!$invite){
+            abort(400, "未找到邀请记录");
+        }
         $userOrder = UserOrders::firstOrCreate(["user_id" => $user->id, "amount" => $request->input('amount') * 100, "is_paid" => 0, 'seller_id' => $seller->id, 'invite_id' => $invite->id], ["production_ids" => $productions]);
         if ($userOrder->transaction_id == "") {
             $userOrder->transaction_id = $userOrder->genTransaction();
