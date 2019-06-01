@@ -36,6 +36,7 @@ class SellerController extends Controller
         return dataResp(["list" => $pageData->items(), 'total' => count($shops), 'total_page' => $pageData->lastPage(), 'current_page' => $pageData->currentPage()]);
     }
 
+
     function productions(Sellers $seller, Request $request)
     {
         $cate_id = $request->input("cate_id");
